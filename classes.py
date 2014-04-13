@@ -109,6 +109,14 @@ class Unit:
 	def addpause(self, pause):
 		self.pauses[pause.weekday] = pause
 
+class SuperUnit(self):
+	def __init__(self):
+		self.units = {}
+	def addunit(self, unit)
+		self.units[unit.code] = unit
+	def checkday(self, day):
+		pass
+
 if __name__ == '__main__':
 	unit = Unit('735')
 	unit.addday(Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 0)))

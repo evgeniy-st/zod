@@ -124,7 +124,7 @@ class Unit:
 	def getrating(self, days):
 		daysvalue = self.checkdays(days)
 		numdays = len([y for y in daysvalue if y[1]])
-		numgooddays = len([x for x in [y[1] for y in daysvalue if y[1]] if x >= self.norm])
+		numgooddays = len([x for x in [y[1] for y in daysvalue if y[1]] if x <= self.norm])
 		percent = round(numgooddays/numdays*100, 2)
 		message = '1' if percent>=90 else '0'
 		return self.code, self.norm, daysvalue, numdays, numgooddays, percent, message
@@ -168,12 +168,32 @@ class SuperUnit():
 	def getratingsuperunit(self, days):
 		unitsvalue = self.getratingunits(days)
 		numdays = len(unitsvalue)
-		print(numdays)
-#		numgooddays = len([x for x in [y[1] for y in daysvalue if y[1]] if x >= self.norm])
-#		percent = round(numgooddays/numdays*100, 2)
-#		message = 'КПЭ выполнен' if percent>=90 else 'КПЭ не выполнен'
-#		return self.code, self.norm, daysvalue, numdays, numgooddays, percent, message
-		
+		numgooddays = len([x for x in unitsvalue if x[7]=='1'])
+		percent = round(numgooddays/numdays*100, 2)
+		message = 'КПЭ выполнен' if percent>=90 else 'КПЭ не выполнен'
+		return self.code, numdays, numgooddays, percent, message
+def MegaUnit():
+	def __init__(self):
+		self.superunits = {}
+	def __str__(self):
+		result = ''
+		for superunit in self.superunits:
+			result += str(self.superunits[superunit]) + '\n'
+	def addsuperunit(self, sunitcode):
+		if sunitcode not in self.superunits:
+			self.superunits[sunitcode] = SuperUnit(suintcode)
+	def adddaytounit(self, sunitcode, unitcode, day):
+		self.addsuperunit(sunitcode)
+		self.superunits[sunitcode].addunit(unitcode, day)
+	def addincidenttounit(self, sunitcode, unitcode, incident):
+		self.addsuperunit(sunitcode)
+		self.superunits[sunitcode].addincidenttounit(unitcode, incident)
+	def addpausetounit(self, sunitcode, unitcode, pause):
+		self.addsuperunit(sunitcode)
+		self.superunits[sunitcode].addpausetounit(unitcode, pause)
+	def setnormunit(self, sunitcode, unitcode, norm):
+		self.addsuperunit(sunitcode)
+		self.superunits[sunitcode].setnormunit(unitcode, norm)
 
 if __name__ == '__main__':
 	unit = Unit('735')
@@ -197,11 +217,13 @@ if __name__ == '__main__':
 	sunit.addincidenttounit('736', Incident(datetime(2014,4,1,15,25), 30))
 	sunit.addincidenttounit('736', Incident(datetime(2014,4,1,16,25), 5))
 
-	sunit.adddaytounit('737', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 3, 17, 10)))
+	sunit.adddaytounit('737', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 10)))
 	sunit.adddaytounit('737', Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
 	sunit.addpausetounit('737', Pause(1, time(hour = 15, minute = 0), 30))
 	sunit.addincidenttounit('737', Incident(datetime(2014,4,1,15,25), 30))
 	sunit.addincidenttounit('737', Incident(datetime(2014,4,1,16,25), 5))
+	sunit.setnormunit('736', 180)
+	sunit.setnormunit('737', 80)
 	print(sunit)
 #	print(sunit.checkdaysunit('736'))
 	print(sunit.getratingunits([date(2014, 4, 1), date(2014, 4, 2), date(2014, 4, 3)]))

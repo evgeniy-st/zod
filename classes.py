@@ -155,6 +155,12 @@ class Unit:
 		"""
 		self.norm = norm
 	def getrating(self, days):
+		"""
+		Calculate rating of unit for days
+		Input: days - list of Day objects
+		Return tupe: code_of_unit, norm_of_unit, list_days_w_value_rating, num_all_day,
+			     num_good_day, percent, message	
+		"""
 		daysvalue = self.checkdays(days)
 		numdays = len([y for y in daysvalue if y[1]])
 		numgooddays = len([x for x in [y[1] for y in daysvalue if y[1]] if x <= self.norm])
@@ -163,7 +169,13 @@ class Unit:
 		return self.code, self.norm, daysvalue, numdays, numgooddays, percent, message
 		
 class SuperUnit():
+	"""
+	SuperUnit class
+	"""
 	def __init__(self, code):
+		"""
+		Input code of SuperUnit
+		"""
 		self.code = code
 		self.units = {}
 	def __str__(self):
@@ -172,30 +184,69 @@ class SuperUnit():
 			result += str(self.units[unit]) + '\n'
 		return result 
 	def addunit(self, unitcode):
+		"""
+		Create Unit object in SuperUnit
+		Input: unitcode - code of new unit
+		"""
 		if unitcode not in self.units:
 			self.units[unitcode] = Unit(unitcode)
 	def adddaytounit(self, unitcode, day):
+		"""
+		Add Day object to unit
+		If unit does`n present then create new unit
+		Input:  unitcode - code of unit
+			day - Day object
+		"""
 		self.addunit(unitcode)
 		self.units[unitcode].addday(day)
 	def addincidenttounit(self, unitcode, incident):
+		"""
+		Add Inciden object to unit
+		If unit does`n present then create new unit
+		Input:  unitcode - code of unit
+			incident - Incident object
+		"""
 		self.addunit(unitcode)
 		self.units[unitcode].addincident(incident)
 	def addpausetounit(self, unitcode, pause):
+		"""
+		Add Inciden object to unit
+		If unit does`n present then create new unit
+		Input:  unitcode - code of unit
+			incident - Incident object
+		"""
 		self.addunit(unitcode)
 		self.units[unitcode].addpause(pause)
 	def checkdaysunit(self, unitcode, days=None):
+		"""
+		Check day of unit
+		Input:  unitcode - code of unit
+			days - list of check day
+		Return: list of tuple (day, value) of work unit or None
+		"""
 		if unitcode in self.units:
 			return self.units[unitcode].checkdays(days)
 	def setnormunit(self, unitcode, norm):
+		"""
+		Set norm of unit
+		Input:  unitcode - code of unit
+			norm - norm of unit
+		"""
 		self.addunit(unitcode)
 		self.units[unitcode].setnorm(norm)
 	def getratingunits(self, days):
+		"""
+		Return rating all units of SuperUnit
+		"""
 		result = []
 		for unit in self.units:
 			if not self.units[unit].delete:
 				result.append((self.code,) + self.units[unit].getrating(days))
 		return result
 	def getratingsuperunit(self, days):
+		"""
+		Return rating of superunit
+		"""
 		unitsvalue = self.getratingunits(days)
 		numdays = len(unitsvalue)
 		numgooddays = len([x for x in unitsvalue if x[7]=='1'])

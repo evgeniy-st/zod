@@ -5,6 +5,9 @@ import segment
 Module for my class
 """
 class Day:
+	"""
+	Describes the day of unit
+	"""
 	def __init__(self, date, timestart, timefinish):	
 		"""
 		date - datetime, but without time :-) (%d.%m.%Y)
@@ -22,10 +25,13 @@ class Day:
 			' - ' + self.timefinish.strftime('%d.%m.%Y %H:%M'))
 	def gettimetuple(self):
 		"""
-		return tuple of start time and finish time
+		Return: tuple of start time and finish time
 		"""
 		return (self.timestart, self.timefinish)
 class Pause:
+	"""
+	Describes the pause in work of unit
+	"""
 	def __init__(self, weekday, time, duration):
 		"""
 		weekday - number
@@ -38,6 +44,9 @@ class Pause:
 	def __str__(self):
 		return (str(self.weekday) + ': с '+ str(self.time) + ' в течении ' + str(self.duration) + ' мин.')
 class Incident:
+	"""
+	Describes the incident in work of unit
+	"""
 	def __init__(self, datetime, duration):
 		"""
 		datetime - datetime
@@ -64,8 +73,7 @@ class Unit:
 		self.incidents = {}
 		self.pauses = {}
 	def __str__(self):
-		result = ''
-		result += 'Code: ' + str(self.code) + '\n'
+		result = 'Code: ' + str(self.code) + '\n'
 		result += 'Delete: ' + str(self.delete) + '\n'
 		result += 'Norm: ' + str(self.norm) + ' min\n'
 		for day in self.days:
@@ -77,6 +85,11 @@ class Unit:
 				result += '\tIncident ' + str(incident) + '\n'
 		return result
 	def checkday(self, day):
+		"""
+		Check the day of unit
+		Input: day - datetime/date, tested day
+		Return: value of work unit or None
+		"""
 		if type(day) == datetime:
 			day = day.date()
 		if day in self.days:
@@ -99,6 +112,14 @@ class Unit:
 			                result -= (z[1] - z[0]).total_seconds()/60
 			return result
 	def checkdays(self, days=None):
+		"""
+		Check the days of unit
+		Input: day - tested day:
+			- if None then check all days
+			- if date/datetime then check one day
+			- if list of date/datetime then check list of days
+		Return: list of tuple (day, value) of work unit or None
+		"""
 		result = []
 		if not days :
 			for day in self.days:
@@ -156,9 +177,6 @@ class SuperUnit():
 	def setnormunit(self, unitcode, norm):
 		self.addunit(unitcode)
 		self.units[unitcode].setnorm(norm)
-#	def getratingunit(self, unitcode, days):
-#		if unitcode in self.units:
-#			return	(self.code,) + self.units[unitcode].getrating(days)
 	def getratingunits(self, days):
 		result = []
 		for unit in self.units:
@@ -172,7 +190,7 @@ class SuperUnit():
 		percent = round(numgooddays/numdays*100, 2)
 		message = 'КПЭ выполнен' if percent>=90 else 'КПЭ не выполнен'
 		return self.code, numdays, numgooddays, percent, message
-def MegaUnit():
+class MegaUnit():
 	def __init__(self):
 		self.superunits = {}
 	def __str__(self):
@@ -181,10 +199,10 @@ def MegaUnit():
 			result += str(self.superunits[superunit]) + '\n'
 	def addsuperunit(self, sunitcode):
 		if sunitcode not in self.superunits:
-			self.superunits[sunitcode] = SuperUnit(suintcode)
+			self.superunits[sunitcode] = SuperUnit(sunitcode)
 	def adddaytounit(self, sunitcode, unitcode, day):
 		self.addsuperunit(sunitcode)
-		self.superunits[sunitcode].addunit(unitcode, day)
+		self.superunits[sunitcode].adddaytounit(unitcode, day)
 	def addincidenttounit(self, sunitcode, unitcode, incident):
 		self.addsuperunit(sunitcode)
 		self.superunits[sunitcode].addincidenttounit(unitcode, incident)
@@ -194,39 +212,73 @@ def MegaUnit():
 	def setnormunit(self, sunitcode, unitcode, norm):
 		self.addsuperunit(sunitcode)
 		self.superunits[sunitcode].setnormunit(unitcode, norm)
+	def getrating(self, days):
+		result = []
+		for sunit in self.superunits:
+			result.append(self.superunits[sunit].getratingsuperunit(days))
+		return result
 
 if __name__ == '__main__':
-	unit = Unit('735')
-	unit.addday(Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 0)))
-	#dayy = Day(datetime(2014, 4, 1).date(), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 0))
-	unit.addday(Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
-	unit.addpause(Pause(1, time(hour = 15, minute = 0), 30))
-	unit.addincident(Incident(datetime(2014,4,1,15,25), 30))
-	unit.addincident(Incident(datetime(2014,4,1,16,25), 5))
-	unit.setnorm(65)
+#	unit = Unit('735')
+#	unit.addday(Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 0)))
+#	#dayy = Day(datetime(2014, 4, 1).date(), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 0))
+#	unit.addday(Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
+#	unit.addpause(Pause(1, time(hour = 15, minute = 0), 30))
+#	unit.addincident(Incident(datetime(2014,4,1,15,25), 30))
+#	unit.addincident(Incident(datetime(2014,4,1,16,25), 5))
+#	unit.setnorm(65)
 #	print(unit)
 #	print(unit.checkday(datetime(2014, 4, 1)))
 #	print(unit.checkday(datetime(2014, 4, 2)))
 #	print(unit.checkdays([date(2014, 4, 1), date(2014, 4, 2)]))
 #	print(unit.getrating([date(2014, 4, 1), date(2014, 4, 2), date(2014, 4, 3)]))
-		
-	sunit = SuperUnit('5230')
-	sunit.adddaytounit('736', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 0)))
-	sunit.adddaytounit('736', Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
-	sunit.addpausetounit('736', Pause(1, time(hour = 15, minute = 0), 30))
-	sunit.addincidenttounit('736', Incident(datetime(2014,4,1,15,25), 30))
-	sunit.addincidenttounit('736', Incident(datetime(2014,4,1,16,25), 5))
-
-	sunit.adddaytounit('737', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 10)))
-	sunit.adddaytounit('737', Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
-	sunit.addpausetounit('737', Pause(1, time(hour = 15, minute = 0), 30))
-	sunit.addincidenttounit('737', Incident(datetime(2014,4,1,15,25), 30))
-	sunit.addincidenttounit('737', Incident(datetime(2014,4,1,16,25), 5))
-	sunit.setnormunit('736', 180)
-	sunit.setnormunit('737', 80)
-	print(sunit)
-#	print(sunit.checkdaysunit('736'))
-	print(sunit.getratingunits([date(2014, 4, 1), date(2014, 4, 2), date(2014, 4, 3)]))
-	print(sunit.getratingsuperunit([date(2014, 4, 1), date(2014, 4, 2), date(2014, 4, 3)]))
-
+#		
+#	sunit = SuperUnit('5230')
+#	
+#	sunit.adddaytounit('736', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 0)))
+#	sunit.adddaytounit('736', Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
+#	sunit.addpausetounit('736', Pause(1, time(hour = 15, minute = 0), 30))
+#	sunit.addincidenttounit('736', Incident(datetime(2014,4,1,15,25), 30))
+#	sunit.addincidenttounit('736', Incident(datetime(2014,4,1,16,25), 5))
+#	sunit.setnormunit('736', 180)
+#
+#	sunit.adddaytounit('737', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 10)))
+#	sunit.adddaytounit('737', Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
+#	sunit.addpausetounit('737', Pause(1, time(hour = 15, minute = 0), 30))
+#	sunit.addincidenttounit('737', Incident(datetime(2014,4,1,15,25), 30))
+#	sunit.addincidenttounit('737', Incident(datetime(2014,4,1,16,25), 5))
+#	sunit.setnormunit('737', 80)
 #	print(sunit)
+#	print(sunit.checkdaysunit('736'))
+#	print(sunit.getratingunits([date(2014, 4, 1), date(2014, 4, 2), date(2014, 4, 3)]))
+#	print(sunit.getratingsuperunit([date(2014, 4, 1), date(2014, 4, 2), date(2014, 4, 3)]))
+	mega = MegaUnit() 
+	mega.adddaytounit('5230', '736', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 0)))
+	mega.adddaytounit('5230', '736', Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
+	mega.addpausetounit('5230', '736', Pause(1, time(hour = 15, minute = 0), 30))
+	mega.addincidenttounit('5230', '736', Incident(datetime(2014,4,1,15,25), 30))
+	mega.addincidenttounit('5230', '736', Incident(datetime(2014,4,1,16,25), 5))
+	mega.setnormunit('5230', '736', 180)
+
+	mega.adddaytounit('5230', '737', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 10)))
+	mega.adddaytounit('5230', '737', Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
+	mega.addpausetounit('5230', '737', Pause(1, time(hour = 15, minute = 0), 30))
+	mega.addincidenttounit('5230', '737', Incident(datetime(2014,4,1,15,25), 30))
+	mega.addincidenttounit('5230', '737', Incident(datetime(2014,4,1,16,25), 5))
+	mega.setnormunit('5230', '737', 80)
+
+	mega.adddaytounit('8643', '04', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 0)))
+	mega.adddaytounit('8643', '04', Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
+	mega.addpausetounit('8643', '04', Pause(1, time(hour = 15, minute = 0), 30))
+	mega.addincidenttounit('8643', '04', Incident(datetime(2014,4,1,15,25), 30))
+	mega.addincidenttounit('8643', '04', Incident(datetime(2014,4,1,16,25), 5))
+	mega.setnormunit('8643', '04', 180)
+
+	mega.adddaytounit('8643', '05', Day(date(2014, 4, 1), datetime(2014, 4, 1, 15, 0), datetime(2014, 4, 1, 17, 10)))
+	mega.adddaytounit('8643', '05', Day(datetime(2014, 4, 2), datetime(2014, 4, 2, 15, 15), datetime(2014, 4, 2, 17, 0)))
+	mega.addpausetounit('8643', '05', Pause(1, time(hour = 15, minute = 0), 30))
+	mega.addincidenttounit('8643', '05', Incident(datetime(2014,4,1,15,25), 30))
+	mega.addincidenttounit('8643', '05', Incident(datetime(2014,4,1,16,25), 5))
+	mega.setnormunit('8643', '05', 80)
+
+	print(mega.getrating([date(2014, 4,1), date(2014, 4, 2), date(2014, 4, 3)]))

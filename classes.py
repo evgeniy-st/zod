@@ -238,11 +238,8 @@ class SuperUnit():
 		"""
 		Return rating all units of SuperUnit
 		"""
-		result = []
-		for unit in self.units:
-			if not self.units[unit].delete:
-				result.append((self.code,) + self.units[unit].getrating(days))
-		return result
+		return [(self.code,) + self.units[unit].getrating(days) for unit in self.units\
+		if not self.units[unit].delete]
 	def getratingsuperunit(self, days):
 		"""
 		Return rating of superunit

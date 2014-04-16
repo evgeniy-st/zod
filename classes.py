@@ -120,27 +120,39 @@ class Unit:
 			- if list of date/datetime then check list of days
 		Return: list of tuple (day, value) of work unit or None
 		"""
-		result = []
 		if not days :
-			for day in self.days:
-				result.append((day, self.checkday(day)))
+			return [(day, self.checkday(day)) for day in self.days]
 		elif type(days) == type([]):
-			for day in days:
-				result.append((day, self.checkday(day)))
+			return [(day, self.checkday(day)) for day in days]
 		elif type(days) == datetime or type(days) == date:
-			result.append((days, self.checkday(days)))
-		return result
+			return [(days, self.checkday(days))]
 	def addday(self, addday):
+		"""
+		Add day to unit
+		addday - Day object
+		"""
 		self.days[addday.day] = addday
 	def addincident(self, incident):
+		"""
+		Add incidetn to unit
+		incident - Incident object
+		"""
 		incidentdate = incident.datetime.date()
 		if incidentdate not in self.incidents:
 			self.incidents[incidentdate] = [incident]
 		else:
 			self.incidents[incidentdate].append(incident)
 	def addpause(self, pause):
+		"""
+		Add pause to unit
+		pause - Pause object
+		"""
 		self.pauses[pause.weekday] = pause
 	def setnorm(self, norm):
+		"""
+		Set norm of unit
+		norm - digital, min
+		"""
 		self.norm = norm
 	def getrating(self, days):
 		daysvalue = self.checkdays(days)
